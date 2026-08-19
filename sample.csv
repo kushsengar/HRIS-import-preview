@@ -1,0 +1,21 @@
+employee_id,employee_name,email,manager_id,manager_email,department
+E001,Alice Johnson,alice@example.com,,,Executive
+E002,Bob Smith,bob@example.com,E001,alice@example.com,Engineering
+E003,Carol White,carol@example.com,E001,,Engineering
+E004,David Brown,david@example.com,E002,bob@example.com,Engineering
+E005,Eve Davis,eve@example.com,E999,,Marketing
+E006,Frank Miller,frank@example.com,E006,,Sales
+E007,Grace Lee,grace@example.com,E008,,Finance
+E008,Helen Kim,helen@example.com,E009,,Finance
+E009,Iris Chen,iris@example.com,E007,,Finance
+E010,Jack Wilson,jack@example.com,E007,,Finance
+E011,Kate Brown,kate@example.com,,,Marketing
+E012,Leo Zhang,leo@example.com,E002,carol@example.com,Engineering
+,No ID Person,noid@example.com,E001,,Unknown
+E014,No Email,,E001,,Unknown
+E015,Duplicate ID,dup1@example.com,E001,,Engineering
+E015,Also Duplicate,dup2@example.com,E001,,Engineering
+E017,Dup Email,shared@example.com,E001,,Marketing
+E018,Also Dup Email,shared@example.com,E001,,Marketing
+E019,"Smith, Jr.",smithjr@example.com,E001,,Engineering
+  E020  , Padded Person , PADDED@Example.com , E001 ,  , Engineering

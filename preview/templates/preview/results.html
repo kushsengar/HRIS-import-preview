@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Import Preview Results</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 960px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #333;
+        }
+        h1 { margin-bottom: 8px; }
+        a { color: #2563eb; }
+
+        /* Summary cards */
+        .summary {
+            display: flex;
+            gap: 16px;
+            margin: 24px 0;
+            flex-wrap: wrap;
+        }
+        .card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px 24px;
+            text-align: center;
+            min-width: 140px;
+        }
+        .card .number {
+            font-size: 32px;
+            font-weight: 700;
+        }
+        .card .label {
+            color: #64748b;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        .card.error-card { border-color: #fca5a5; background: #fef2f2; }
+        .card.error-card .number { color: #dc2626; }
+        .card.success-card { border-color: #86efac; background: #f0fdf4; }
+        .card.success-card .number { color: #16a34a; }
+
+        /* Section */
+        section { margin-top: 32px; }
+        h2 {
+            font-size: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+        th {
+            background: #f1f5f9;
+            text-align: left;
+            padding: 10px 12px;
+            font-weight: 600;
+        }
+        td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        tr:hover { background: #f8fafc; }
+        .error-msg { color: #dc2626; }
+        .cycle-tag {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .empty-state {
+            color: #94a3b8;
+            font-style: italic;
+            padding: 16px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Import Preview Results</h1>
+    <p><a href="/">← Upload another file</a></p>
+
+    <!-- ============================================================ -->
+    <!-- Summary Cards                                                 -->
+    <!-- ============================================================ -->
+    <div class="summary">
+        <div class="card">
+            <div class="number">{{ result.total_rows }}</div>
+            <div class="label">Total Source Rows</div>
+        </div>
+        <div class="card success-card">
+            <div class="number">{{ result.accepted_count }}</div>
+            <div class="label">Accepted Employees</div>
+        </div>
+        <div class="card error-card">
+            <div class="number">{{ result.error_count }}</div>
+            <div class="label">Validation Errors</div>
+        </div>
+        <div class="card">
+            <div class="number">{{ result.roots|length }}</div>
+            <div class="label">Root Employees</div>
+        </div>
+        <div class="card">
+            <div class="number">{{ result.cycle_members|length }}</div>
+            <div class="label">Cycle Members</div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- Validation Errors                                             -->
+    <!-- ============================================================ -->
+    <section>
+        <h2>Validation Errors</h2>
+        {% if result.errors %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Row #</th>
+                    <th>Employee ID</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for err in result.errors %}
+                <tr>
+                    <td>{{ err.row_number }}</td>
+                    <td>{{ err.employee_id }}</td>
+                    <td class="error-msg">{{ err.message }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-state">No validation errors found.</p>
+        {% endif %}
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- Root Employees                                                -->
+    <!-- ============================================================ -->
+    <section>
+        <h2>Root Employees (No Manager)</h2>
+        {% if result.roots %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Row #</th>
+                    <th>Employee ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in result.roots %}
+                <tr>
+                    <td>{{ emp.row_number }}</td>
+                    <td>{{ emp.employee_id }}</td>
+                    <td>{{ emp.employee_name }}</td>
+                    <td>{{ emp.email }}</td>
+                    <td>{{ emp.department }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-state">No root employees found.</p>
+        {% endif %}
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- Managers & Direct Reports                                     -->
+    <!-- ============================================================ -->
+    <section>
+        <h2>Managers &amp; Direct Reports</h2>
+        {% if result.managers %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Manager Name</th>
+                    <th>Department</th>
+                    <th>Direct Reports</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mgr in result.managers %}
+                <tr>
+                    <td>{{ mgr.employee_id }}</td>
+                    <td>{{ mgr.employee_name }}</td>
+                    <td>{{ mgr.department }}</td>
+                    <td>{{ mgr.direct_report_count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-state">No managers found.</p>
+        {% endif %}
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- Reporting Cycles                                              -->
+    <!-- ============================================================ -->
+    <section>
+        <h2>Reporting Cycles</h2>
+        {% if result.cycle_members %}
+        <p>
+            The following <strong>{{ result.cycle_members|length }}</strong>
+            employee{{ result.cycle_members|length|pluralize }}
+            form a reporting cycle. Only direct cycle participants are listed;
+            employees who merely report into a cycle are not included.
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Row #</th>
+                    <th>Employee ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in result.cycle_members %}
+                <tr>
+                    <td>{{ emp.row_number }}</td>
+                    <td>{{ emp.employee_id }}</td>
+                    <td>{{ emp.employee_name }}</td>
+                    <td>{{ emp.email }}</td>
+                    <td>{{ emp.department }}</td>
+                    <td><span class="cycle-tag">CYCLE</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-state">No reporting cycles detected.</p>
+        {% endif %}
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- Accepted Employees (full list)                                -->
+    <!-- ============================================================ -->
+    <section>
+        <h2>Accepted Employees</h2>
+        {% if result.accepted_employees %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Row #</th>
+                    <th>Employee ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in result.accepted_employees %}
+                <tr>
+                    <td>{{ emp.row_number }}</td>
+                    <td>{{ emp.employee_id }}</td>
+                    <td>{{ emp.employee_name }}</td>
+                    <td>{{ emp.email }}</td>
+                    <td>{{ emp.department }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-state">No employees were accepted.</p>
+        {% endif %}
+    </section>
+</body>
+</html>
