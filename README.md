@@ -94,8 +94,4 @@ For a file with **n** employees:
 Each step makes a single pass over the data with dictionary lookups (O(1)
 average). A 100,000-row file processes in well under a second.
 
-## AI Tools Used
 
-Google Gemini (Antigravity) was used to help scaffold the project structure,
-generate boilerplate, and draft the sample CSV. All logic was reviewed,
-understood, and validated by hand.
